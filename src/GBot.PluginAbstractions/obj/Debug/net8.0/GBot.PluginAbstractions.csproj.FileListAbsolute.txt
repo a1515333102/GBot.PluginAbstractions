@@ -1,0 +1,12 @@
+D:\GBOT\src\GBot.PluginAbstractions\bin\Debug\net8.0\GBot.PluginAbstractions.deps.json
+D:\GBOT\src\GBot.PluginAbstractions\bin\Debug\net8.0\GBot.PluginAbstractions.dll
+D:\GBOT\src\GBot.PluginAbstractions\bin\Debug\net8.0\GBot.PluginAbstractions.pdb
+D:\GBOT\src\GBot.PluginAbstractions\obj\Debug\net8.0\GBot.PluginAbstractions.GeneratedMSBuildEditorConfig.editorconfig
+D:\GBOT\src\GBot.PluginAbstractions\obj\Debug\net8.0\GBot.PluginAbstractions.AssemblyInfoInputs.cache
+D:\GBOT\src\GBot.PluginAbstractions\obj\Debug\net8.0\GBot.PluginAbstractions.AssemblyInfo.cs
+D:\GBOT\src\GBot.PluginAbstractions\obj\Debug\net8.0\GBot.PluginAbstractions.csproj.CoreCompileInputs.cache
+D:\GBOT\src\GBot.PluginAbstractions\obj\Debug\net8.0\GBot.PluginAbstractions.dll
+D:\GBOT\src\GBot.PluginAbstractions\obj\Debug\net8.0\refint\GBot.PluginAbstractions.dll
+D:\GBOT\src\GBot.PluginAbstractions\obj\Debug\net8.0\GBot.PluginAbstractions.pdb
+D:\GBOT\src\GBot.PluginAbstractions\obj\Debug\net8.0\ref\GBot.PluginAbstractions.dll
+D:\GBOT\src\GBot.PluginAbstractions\obj\Debug\net8.0\GBot.PluginAbstractions.sourcelink.json
