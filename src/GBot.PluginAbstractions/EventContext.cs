@@ -71,11 +71,15 @@ public sealed class EventContext
         => Api.ReplyAsync(this, message, ct);
 
     /// <summary>按场景回复 Markdown（可附键盘）。</summary>
-    public Task<ApiResponse> ReplyMarkdownAsync(string markdown, object? keyboard = null, CancellationToken ct = default)
+    /// <param name="forceVerifyImageResource">为 true 时图片转存失败则整条失败（默认 false）。</param>
+    public Task<ApiResponse> ReplyMarkdownAsync(
+        string markdown, object? keyboard = null, bool forceVerifyImageResource = false, CancellationToken ct = default)
         => Scene switch
         {
-            MessageScene.Group => Api.SendGroupMarkdownAsync(RobotId, SourceId, markdown, MessageId, keyboard, ct),
-            MessageScene.C2C => Api.SendPrivateMarkdownAsync(RobotId, FromOpenId, markdown, MessageId, keyboard, ct),
+            MessageScene.Group => Api.SendGroupMarkdownAsync(
+                RobotId, SourceId, markdown, MessageId, keyboard, forceVerifyImageResource, ct),
+            MessageScene.C2C => Api.SendPrivateMarkdownAsync(
+                RobotId, FromOpenId, markdown, MessageId, keyboard, forceVerifyImageResource, ct),
             _ => Task.FromResult(ApiResponse.Fail($"无法回复：未知场景 {Scene}")),
         };
 
@@ -94,6 +98,30 @@ public sealed class EventContext
         => Scene == MessageScene.C2C
             ? Api.SendInputNotifyAsync(RobotId, FromOpenId, MessageId, inputSeconds, ct)
             : Task.FromResult(ApiResponse.Fail("正在输入仅支持私聊"));
+
+    /// <summary>本条消息中第一张图片的 URL（来自 attachments / Segments）。</summary>
+    public string? GetFirstImageUrl()
+    {
+        foreach (var seg in Segments)
+        {
+            if (!string.Equals(seg.Type, "image", StringComparison.OrdinalIgnoreCase))
+                continue;
+            var url = seg["url"];
+            if (!string.IsNullOrWhiteSpace(url))
+                return url.Trim();
+        }
+
+        return null;
+    }
+
+    /// <summary>识别本条消息第一张图的文字（见 <see cref="IPluginApi.RecognizeImageAsync"/>）。</summary>
+    public Task<ApiResponse> RecognizeFirstImageAsync(string? endpoint = null, CancellationToken ct = default)
+    {
+        var url = GetFirstImageUrl();
+        if (string.IsNullOrWhiteSpace(url))
+            return Task.FromResult(ApiResponse.Fail("消息中无图片"));
+        return Api.RecognizeImageAsync(url, endpoint, ct);
+    }
 }
 
 public enum MessageScene

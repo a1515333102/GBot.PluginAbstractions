@@ -47,6 +47,7 @@ public abstract class BotPluginBase : IBotPlugin
         PluginEventType.GroupDelRobot => OnGroupDelRobot(context),
         PluginEventType.GroupMemberAdd => OnGroupMemberAdd(context),
         PluginEventType.GroupMemberRemove => OnGroupMemberRemove(context),
+        PluginEventType.GroupJoinRequest => OnGroupJoinRequest(context),
         PluginEventType.Interaction => OnInteraction(context),
         _ => OnUnknownEvent(context),
     };
@@ -60,6 +61,7 @@ public abstract class BotPluginBase : IBotPlugin
     public virtual int OnGroupDelRobot(EventContext context) => 0;
     public virtual int OnGroupMemberAdd(EventContext context) => 0;
     public virtual int OnGroupMemberRemove(EventContext context) => 0;
+    public virtual int OnGroupJoinRequest(EventContext context) => 0;
     public virtual int OnInteraction(EventContext context) => 0;
     public virtual int OnUnknownEvent(EventContext context) => 0;
 

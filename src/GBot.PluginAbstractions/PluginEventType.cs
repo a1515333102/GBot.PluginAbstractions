@@ -32,6 +32,9 @@ public enum PluginEventType
     /// <summary>群成员退出（GROUP_MEMBER_REMOVE）。</summary>
     GroupMemberRemove = 23,
 
+    /// <summary>用户申请加群（GROUP_JOIN_REQUEST；机器人须为群管理员）。</summary>
+    GroupJoinRequest = 24,
+
     /// <summary>互动事件（INTERACTION_CREATE）。</summary>
     Interaction = 30,
 }

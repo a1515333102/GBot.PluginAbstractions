@@ -48,22 +48,30 @@ public interface IPluginApi
         IDictionary<string, object?> body,
         CancellationToken ct = default);
 
-    /// <summary>群 Markdown（msg_type=2）。可附带 keyboard。</summary>
+    /// <summary>
+    /// 群 Markdown（msg_type=2）。可附带 keyboard。
+    /// <paramref name="forceVerifyImageResource"/> 为 true 时，图片转存失败则整条消息失败（默认 false，保持原行为）。
+    /// </summary>
     Task<ApiResponse> SendGroupMarkdownAsync(
         string robotId,
         string groupOpenId,
         string markdown,
         string? msgId = null,
         object? keyboard = null,
+        bool forceVerifyImageResource = false,
         CancellationToken ct = default);
 
-    /// <summary>私聊 Markdown（msg_type=2）。可附带 keyboard。</summary>
+    /// <summary>
+    /// 私聊 Markdown（msg_type=2）。可附带 keyboard。
+    /// <paramref name="forceVerifyImageResource"/> 为 true 时，图片转存失败则整条消息失败（默认 false，保持原行为）。
+    /// </summary>
     Task<ApiResponse> SendPrivateMarkdownAsync(
         string robotId,
         string userOpenId,
         string markdown,
         string? msgId = null,
         object? keyboard = null,
+        bool forceVerifyImageResource = false,
         CancellationToken ct = default);
 
     /// <summary>群 ARK（msg_type=3）。ark 为官方结构（template_id + kv）。</summary>
@@ -198,6 +206,141 @@ public interface IPluginApi
         string robotId,
         string userOpenId,
         string messageId,
+        CancellationToken ct = default);
+
+    // ── 群资料（内邀能力，无权限时会失败）────────────────
+
+    /// <summary>获取群基础信息：GET /v2/groups/{group_openid}/info（群名、人数等）。</summary>
+    Task<ApiResponse> GetGroupInfoAsync(
+        string robotId,
+        string groupOpenId,
+        CancellationToken ct = default);
+
+    /// <summary>获取机器人群内状态：GET /v2/groups/{group_openid}/bot_state。</summary>
+    Task<ApiResponse> GetGroupBotStateAsync(
+        string robotId,
+        string groupOpenId,
+        CancellationToken ct = default);
+
+    /// <summary>
+    /// 拉取入群申请列表（分页）：GET /v2/groups/{group_openid}/join_request_list。
+    /// 机器人须为群管理员。响应见 <see cref="GroupJoinRequestList"/>。
+    /// </summary>
+    /// <param name="cursor">分页游标；首次可不传。</param>
+    /// <param name="limit">单页数量，默认 20，最大 100。</param>
+    Task<ApiResponse> GetGroupJoinRequestListAsync(
+        string robotId,
+        string groupOpenId,
+        string? cursor = null,
+        int? limit = null,
+        CancellationToken ct = default);
+
+    /// <summary>
+    /// 审批入群申请：POST /v2/groups/{group_openid}/approval_join_request/{member_openid}。
+    /// <paramref name="op"/> 为 <c>approve</c> / <c>decline</c>；机器人须为群管理员。
+    /// </summary>
+    Task<ApiResponse> ApproveGroupJoinRequestAsync(
+        string robotId,
+        string groupOpenId,
+        string memberOpenId,
+        string op,
+        string? joinRequestId = null,
+        string? rejectReason = null,
+        bool addToMemberBlacklist = false,
+        CancellationToken ct = default);
+
+    /// <summary>
+    /// 查询群禁言状态：GET /v2/groups/{group_openid}/restrict_chat_setting。
+    /// 含全员禁言规则与成员级禁言列表；机器人须为群管理员。响应见 <see cref="GroupRestrictChatSetting"/>。
+    /// </summary>
+    Task<ApiResponse> GetGroupRestrictChatSettingAsync(
+        string robotId,
+        string groupOpenId,
+        CancellationToken ct = default);
+
+    /// <summary>
+    /// 设置群成员禁言：POST /v2/groups/{group_openid}/restrict_chat_setting。
+    /// 每项 <see cref="GroupSetMemberMuteState.Op"/> 为 <c>add</c> / <c>update</c> / <c>del</c>；单次最多 10 个；机器人须为群管理员。
+    /// </summary>
+    Task<ApiResponse> SetGroupMemberMuteAsync(
+        string robotId,
+        string groupOpenId,
+        IReadOnlyList<GroupSetMemberMuteState> members,
+        CancellationToken ct = default);
+
+    /// <summary>
+    /// 查询入群自动审批策略列表（分页）：GET /v2/groups/join_approval_strategy。
+    /// 响应见 <see cref="GroupJoinApprovalStrategyList"/>。
+    /// </summary>
+    Task<ApiResponse> GetGroupJoinApprovalStrategiesAsync(
+        string robotId,
+        string? cursor = null,
+        int? limit = null,
+        CancellationToken ct = default);
+
+    /// <summary>
+    /// 创建入群自动审批策略：POST /v2/groups/join_approval_strategy。
+    /// <paramref name="groupOpenIds"/> 与 <paramref name="groupIds"/> 二选一必填（互斥，最多各 100）；响应见 <see cref="GroupJoinApprovalStrategyCreated"/>。
+    /// </summary>
+    Task<ApiResponse> CreateGroupJoinApprovalStrategyAsync(
+        string robotId,
+        IReadOnlyList<string>? groupOpenIds = null,
+        IReadOnlyList<string>? groupIds = null,
+        string? isEnable = null,
+        string? expireAt = null,
+        string? remark = null,
+        CancellationToken ct = default);
+
+    /// <summary>
+    /// 修改入群自动审批策略：PATCH /v2/groups/join_approval_strategy/{strategy_id}。
+    /// 可改启用状态、过期时间、备注，或通过 <paramref name="groupAction"/> 增删关联群；响应见 <see cref="GroupJoinApprovalStrategyUpdated"/>。
+    /// </summary>
+    Task<ApiResponse> UpdateGroupJoinApprovalStrategyAsync(
+        string robotId,
+        string strategyId,
+        string? isEnable = null,
+        string? expireAt = null,
+        string? remark = null,
+        GroupJoinApprovalGroupAction? groupAction = null,
+        CancellationToken ct = default);
+
+    /// <summary>
+    /// 删除入群自动审批策略：DELETE /v2/groups/join_approval_strategy/{strategy_id}。
+    /// </summary>
+    Task<ApiResponse> DeleteGroupJoinApprovalStrategyAsync(
+        string robotId,
+        string strategyId,
+        CancellationToken ct = default);
+
+    /// <summary>
+    /// 执行入群自动审批策略（异步全量扫描）：POST /v2/groups/join_approval_strategy/{strategy_id}/execute。
+    /// 命中白名单的入群申请自动通过；约 10 分钟完成。
+    /// </summary>
+    Task<ApiResponse> ExecuteGroupJoinApprovalStrategyAsync(
+        string robotId,
+        string strategyId,
+        CancellationToken ct = default);
+
+    /// <summary>
+    /// 修改入群自动审批策略白名单：POST /v2/groups/join_approval_strategy/{strategy_id}/whitelist_users。
+    /// <paramref name="op"/> 为 <c>add</c> / <c>del</c>；单次最多 10000 个 QQ 号（字符串）；响应见 <see cref="GroupJoinApprovalWhitelistResult"/>。
+    /// </summary>
+    Task<ApiResponse> UpdateGroupJoinApprovalWhitelistAsync(
+        string robotId,
+        string strategyId,
+        string op,
+        IReadOnlyList<string> whitelistUsers,
+        CancellationToken ct = default);
+
+    // ── 图片识别（第三方 OCR，非 QQ 官方）────────────────
+
+    /// <summary>
+    /// 图片文字识别：向识别服务 POST <c>{"url": imageUrl}</c>，成功时 <see cref="ApiResponse.Message"/> 为识别文本。
+    /// <paramref name="endpoint"/> 为空则用宿主设置里的图片识别地址。
+    /// </summary>
+    Task<ApiResponse> RecognizeImageAsync(
+        string imageUrl,
+        string? endpoint = null,
         CancellationToken ct = default);
 
     /// <summary>指定 AppId 的官方网关是否已 READY（能收群消息/艾特以刷新 msg_id）。</summary>
