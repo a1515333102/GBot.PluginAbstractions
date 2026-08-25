@@ -2,7 +2,7 @@
 
 GBot 插件契约（公开）。主程序 GBot 可为私有；插件作者引用本仓库即可开发与打包。
 
-当前 ABI：`PluginAbstractionsVersion.Major = 1`
+当前 ABI：`PluginAbstractionsVersion` = **1.5.0**（`Major = 1`，市场 `abstractionsMajor` 填 `1`）
 
 ## 引用方式
 

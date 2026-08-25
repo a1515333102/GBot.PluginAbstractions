@@ -9,7 +9,7 @@ public enum MediaFileType
     /// <summary>视频 mp4。</summary>
     Video = 2,
 
-    /// <summary>语音 silk。</summary>
+    /// <summary>语音。非 silk 的 url/file_data 由宿主自动转码为腾讯 silk 再上传。</summary>
     Voice = 3,
 
     /// <summary>文件（需开通权限）。</summary>

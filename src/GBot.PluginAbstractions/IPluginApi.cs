@@ -108,7 +108,10 @@ public interface IPluginApi
 
     // ── 富媒体 ────────────────────────────────────────────
 
-    /// <summary>上传群富媒体，返回含 file_info 的响应（srvSendMsg=true 时服务端直接下发）。</summary>
+    /// <summary>
+    /// 上传群富媒体，返回含 file_info 的响应（srvSendMsg=true 时服务端直接下发）。
+    /// Voice：若传入普通音频 url / 非 silk 的 file_data，宿主会先转码为腾讯 silk。
+    /// </summary>
     Task<ApiResponse> UploadGroupMediaAsync(
         string robotId,
         string groupOpenId,
@@ -194,14 +197,14 @@ public interface IPluginApi
 
     // ── 撤回 ──────────────────────────────────────────────
 
-    /// <summary>撤回群消息（仅机器人自己发的，约 2 分钟内）。</summary>
+    /// <summary>撤回群消息（机器人自己发的，或管理员撤回群成员消息）。</summary>
     Task<ApiResponse> RecallGroupMessageAsync(
         string robotId,
         string groupOpenId,
         string messageId,
         CancellationToken ct = default);
 
-    /// <summary>撤回私聊消息（仅机器人自己发的，约 2 分钟内）。</summary>
+    /// <summary>撤回私聊消息（机器人自己发的）。</summary>
     Task<ApiResponse> RecallPrivateMessageAsync(
         string robotId,
         string userOpenId,
@@ -332,6 +335,98 @@ public interface IPluginApi
         IReadOnlyList<string> whitelistUsers,
         CancellationToken ct = default);
 
+    // ── 自定义菜单 / 指令面板 ────────────────────────────
+    // 文档：https://bot.q.qq.com/wiki/develop/api-v2/server-inter/menu-panel/
+
+    /// <summary>查询全局自定义菜单：GET /v2/menu（仅 C2C 底部菜单）。</summary>
+    Task<ApiResponse> GetGlobalMenuAsync(string robotId, CancellationToken ct = default);
+
+    /// <summary>
+    /// 修改全局自定义菜单：PUT /v2/menu。
+    /// <paramref name="menu"/> 为空则按官方语义传入空 menu；会覆盖完整菜单配置。
+    /// </summary>
+    Task<ApiResponse> UpdateGlobalMenuAsync(
+        string robotId,
+        BotMenu? menu,
+        CancellationToken ct = default);
+
+    /// <summary>
+    /// 查询指令面板列表：GET /v2/panels。
+    /// <paramref name="scope"/> 必填：c2c / group / channel / dm。
+    /// </summary>
+    Task<ApiResponse> GetCommandPanelsAsync(
+        string robotId,
+        string scope,
+        string? cursor = null,
+        int? limit = null,
+        CancellationToken ct = default);
+
+    /// <summary>
+    /// 创建指令面板：POST /v2/panels。
+    /// <paramref name="scope"/>：c2c / group / channel / dm；
+    /// <paramref name="targetType"/>：all / specific（channel/dm 仅 all）。
+    /// </summary>
+    Task<ApiResponse> CreateCommandPanelAsync(
+        string robotId,
+        string scope,
+        BotCommandPanel panel,
+        string? targetType = null,
+        IReadOnlyList<string>? userOpenIds = null,
+        IReadOnlyList<string>? groupOpenIds = null,
+        CancellationToken ct = default);
+
+    /// <summary>查询指令面板详情：GET /v2/panels/{panel_id}。</summary>
+    Task<ApiResponse> GetCommandPanelAsync(
+        string robotId,
+        string panelId,
+        CancellationToken ct = default);
+
+    /// <summary>修改指令面板内容：PUT /v2/panels/{panel_id}（不影响关联对象）。</summary>
+    Task<ApiResponse> UpdateCommandPanelAsync(
+        string robotId,
+        string panelId,
+        BotCommandPanel panel,
+        CancellationToken ct = default);
+
+    /// <summary>删除指令面板：DELETE /v2/panels/{panel_id}。</summary>
+    Task<ApiResponse> DeleteCommandPanelAsync(
+        string robotId,
+        string panelId,
+        CancellationToken ct = default);
+
+    /// <summary>
+    /// 修改指令面板关联对象：PUT /v2/panels/{panel_id}/target。
+    /// <paramref name="op"/>：add / del；c2c 用 userOpenIds，group 用 groupOpenIds。
+    /// </summary>
+    Task<ApiResponse> UpdateCommandPanelTargetsAsync(
+        string robotId,
+        string panelId,
+        string op,
+        IReadOnlyList<string>? userOpenIds = null,
+        IReadOnlyList<string>? groupOpenIds = null,
+        CancellationToken ct = default);
+
+    // ── 群成员角色（宿主缓存）────────────────────────────
+
+    /// <summary>
+    /// 写入群成员角色缓存。宿主在分发群消息时会自动调用；插件也可补充。
+    /// <paramref name="memberRole"/> 为 <c>owner</c> / <c>admin</c> / <c>member</c>。
+    /// </summary>
+    void RememberGroupMemberRole(
+        string robotId,
+        string groupOpenId,
+        string memberOpenId,
+        string memberRole);
+
+    /// <summary>
+    /// 读取群成员角色缓存：<c>owner</c> / <c>admin</c> / <c>member</c>；未知返回空字符串。
+    /// 官方群聊目前无按 openid 实时查询成员身份的公开接口，依赖群消息事件中的 <c>member_role</c>。
+    /// </summary>
+    string GetGroupMemberRole(string robotId, string groupOpenId, string memberOpenId);
+
+    /// <summary>是否群主或管理员（基于宿主角色缓存；未知为 false）。</summary>
+    bool IsGroupOwnerOrAdmin(string robotId, string groupOpenId, string memberOpenId);
+
     // ── 图片识别（第三方 OCR，非 QQ 官方）────────────────
 
     /// <summary>
@@ -345,6 +440,12 @@ public interface IPluginApi
 
     /// <summary>指定 AppId 的官方网关是否已 READY（能收群消息/艾特以刷新 msg_id）。</summary>
     bool IsGatewayReady(string robotId);
+
+    /// <summary>
+    /// 当前会话网关收发计数（自本次连接起；重连会清零）。
+    /// <see cref="GatewayTrafficInfo.Received"/> 为网关入站帧，<see cref="GatewayTrafficInfo.Sent"/> 为宿主发出的 API 次数。
+    /// </summary>
+    GatewayTrafficInfo GetGatewayTraffic(string robotId);
 
     void LogInfo(string message);
     void LogWarning(string message);

@@ -67,10 +67,36 @@ internal sealed class NullPluginApi : IPluginApi
         string robotId, string strategyId, string op, IReadOnlyList<string> whitelistUsers,
         CancellationToken ct = default) => Fail();
 
+    public Task<ApiResponse> GetGlobalMenuAsync(string robotId, CancellationToken ct = default) => Fail();
+    public Task<ApiResponse> UpdateGlobalMenuAsync(string robotId, BotMenu? menu, CancellationToken ct = default) => Fail();
+    public Task<ApiResponse> GetCommandPanelsAsync(
+        string robotId, string scope, string? cursor = null, int? limit = null, CancellationToken ct = default) => Fail();
+    public Task<ApiResponse> CreateCommandPanelAsync(
+        string robotId, string scope, BotCommandPanel panel, string? targetType = null,
+        IReadOnlyList<string>? userOpenIds = null, IReadOnlyList<string>? groupOpenIds = null,
+        CancellationToken ct = default) => Fail();
+    public Task<ApiResponse> GetCommandPanelAsync(string robotId, string panelId, CancellationToken ct = default) => Fail();
+    public Task<ApiResponse> UpdateCommandPanelAsync(
+        string robotId, string panelId, BotCommandPanel panel, CancellationToken ct = default) => Fail();
+    public Task<ApiResponse> DeleteCommandPanelAsync(string robotId, string panelId, CancellationToken ct = default) => Fail();
+    public Task<ApiResponse> UpdateCommandPanelTargetsAsync(
+        string robotId, string panelId, string op,
+        IReadOnlyList<string>? userOpenIds = null, IReadOnlyList<string>? groupOpenIds = null,
+        CancellationToken ct = default) => Fail();
+
     public Task<ApiResponse> RecognizeImageAsync(
         string imageUrl, string? endpoint = null, CancellationToken ct = default) => Fail();
 
+    public void RememberGroupMemberRole(
+        string robotId, string groupOpenId, string memberOpenId, string memberRole) { }
+
+    public string GetGroupMemberRole(string robotId, string groupOpenId, string memberOpenId) => "";
+
+    public bool IsGroupOwnerOrAdmin(string robotId, string groupOpenId, string memberOpenId) => false;
+
     public bool IsGatewayReady(string robotId) => false;
+
+    public GatewayTrafficInfo GetGatewayTraffic(string robotId) => default;
 
     public void LogInfo(string message) { }
     public void LogWarning(string message) { }
