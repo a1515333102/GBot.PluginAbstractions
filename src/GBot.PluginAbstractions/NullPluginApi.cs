@@ -41,6 +41,19 @@ internal sealed class NullPluginApi : IPluginApi
     public Task<ApiResponse> SetGroupMemberMuteAsync(
         string robotId, string groupOpenId, IReadOnlyList<GroupSetMemberMuteState> members,
         CancellationToken ct = default) => Fail();
+    public Task<ApiResponse> GetGroupMembersAsync(
+        string robotId, string groupOpenId, string? cursor = null, CancellationToken ct = default) => Fail();
+    public Task<ApiResponse> GetGroupMemberAsync(
+        string robotId, string groupOpenId, string memberOpenId, CancellationToken ct = default) => Fail();
+    public Task<ApiResponse> BatchRemoveGroupMembersAsync(
+        string robotId, string groupOpenId, IReadOnlyList<string> memberOpenIds,
+        bool addToMemberBlacklist = false, CancellationToken ct = default) => Fail();
+    public Task<ApiResponse> GetGroupMemberBlacklistAsync(
+        string robotId, string groupOpenId, string? cursor = null, int? limit = null,
+        CancellationToken ct = default) => Fail();
+    public Task<ApiResponse> UpdateGroupMemberBlacklistAsync(
+        string robotId, string groupOpenId, string op, IReadOnlyList<string> memberOpenIds,
+        CancellationToken ct = default) => Fail();
     public Task<ApiResponse> GetGroupJoinApprovalStrategiesAsync(
         string robotId, string? cursor = null, int? limit = null, CancellationToken ct = default) => Fail();
     public Task<ApiResponse> CreateGroupJoinApprovalStrategyAsync(

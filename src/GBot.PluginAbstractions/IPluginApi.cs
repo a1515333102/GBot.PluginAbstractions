@@ -272,6 +272,61 @@ public interface IPluginApi
         CancellationToken ct = default);
 
     /// <summary>
+    /// 获取群成员列表（分页，每页最多 30）：GET /v2/groups/{group_openid}/members。
+    /// 白名单内邀；响应见 <see cref="GroupMemberList"/>。
+    /// </summary>
+    /// <param name="cursor">分页游标；首次可不传或传空串；后续传上一页的 <c>next_cursor</c>。</param>
+    Task<ApiResponse> GetGroupMembersAsync(
+        string robotId,
+        string groupOpenId,
+        string? cursor = null,
+        CancellationToken ct = default);
+
+    /// <summary>
+    /// 获取指定群成员信息：GET /v2/groups/{group_openid}/members/{member_openid}。
+    /// 白名单内邀；响应见 <see cref="GroupMemberInfo"/>。成功时会写入角色缓存。
+    /// </summary>
+    Task<ApiResponse> GetGroupMemberAsync(
+        string robotId,
+        string groupOpenId,
+        string memberOpenId,
+        CancellationToken ct = default);
+
+    /// <summary>
+    /// 群成员批量移除：POST /v2/groups/{group_openid}/batch_remove_members。
+    /// 单次最多 20 人；可选同时加入群黑名单；白名单内邀；响应见 <see cref="GroupBatchRemoveMembersResult"/>。
+    /// </summary>
+    Task<ApiResponse> BatchRemoveGroupMembersAsync(
+        string robotId,
+        string groupOpenId,
+        IReadOnlyList<string> memberOpenIds,
+        bool addToMemberBlacklist = false,
+        CancellationToken ct = default);
+
+    /// <summary>
+    /// 查询群黑名单（分页）：GET /v2/groups/{group_openid}/member_blacklist。
+    /// 白名单内邀；响应见 <see cref="GroupMemberBlacklist"/>。
+    /// </summary>
+    /// <param name="limit">单页数量，默认 20，最大 100。</param>
+    Task<ApiResponse> GetGroupMemberBlacklistAsync(
+        string robotId,
+        string groupOpenId,
+        string? cursor = null,
+        int? limit = null,
+        CancellationToken ct = default);
+
+    /// <summary>
+    /// 群黑名单操作：POST /v2/groups/{group_openid}/member_blacklist。
+    /// <paramref name="op"/> 为 <c>add</c> / <c>del</c>；单次最多 20 人；目标仍在群内时无法拉黑；白名单内邀；响应见 <see cref="GroupMemberBlacklistOpResult"/>。
+    /// </summary>
+    Task<ApiResponse> UpdateGroupMemberBlacklistAsync(
+        string robotId,
+        string groupOpenId,
+        string op,
+        IReadOnlyList<string> memberOpenIds,
+        CancellationToken ct = default);
+
+    /// <summary>
     /// 查询入群自动审批策略列表（分页）：GET /v2/groups/join_approval_strategy。
     /// 响应见 <see cref="GroupJoinApprovalStrategyList"/>。
     /// </summary>
@@ -420,7 +475,7 @@ public interface IPluginApi
 
     /// <summary>
     /// 读取群成员角色缓存：<c>owner</c> / <c>admin</c> / <c>member</c>；未知返回空字符串。
-    /// 官方群聊目前无按 openid 实时查询成员身份的公开接口，依赖群消息事件中的 <c>member_role</c>。
+    /// 优先用消息事件写入的缓存；也可调用 <see cref="GetGroupMemberAsync"/> 拉取后自行 <see cref="RememberGroupMemberRole"/>。
     /// </summary>
     string GetGroupMemberRole(string robotId, string groupOpenId, string memberOpenId);
 

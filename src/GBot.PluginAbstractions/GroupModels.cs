@@ -304,3 +304,90 @@ public sealed class GroupJoinApprovalWhitelistResult
     [JsonPropertyName("updated_at")]
     public string UpdatedAt { get; init; } = "";
 }
+
+/// <summary>GET /v2/groups/{group_openid}/members 响应（每页最多 30）。</summary>
+public sealed class GroupMemberList
+{
+    [JsonPropertyName("members")]
+    public IReadOnlyList<GroupMemberInfo> Members { get; init; } = [];
+
+    /// <summary>下一页游标；空串表示已到末页。</summary>
+    [JsonPropertyName("next_cursor")]
+    public string NextCursor { get; init; } = "";
+}
+
+/// <summary>
+/// 群成员信息（列表项 / GET …/members/{member_openid} 响应）。
+/// </summary>
+public sealed class GroupMemberInfo
+{
+    [JsonPropertyName("member_openid")]
+    public string MemberOpenId { get; init; } = "";
+
+    [JsonPropertyName("username")]
+    public string Username { get; init; } = "";
+
+    /// <summary>member / owner / admin</summary>
+    [JsonPropertyName("member_role")]
+    public string MemberRole { get; init; } = "";
+
+    [JsonPropertyName("bot")]
+    public bool Bot { get; init; }
+
+    /// <summary>入群时间（RFC3339）。</summary>
+    [JsonPropertyName("joined_at")]
+    public string JoinedAt { get; init; } = "";
+
+    [JsonPropertyName("union_openid")]
+    public string UnionOpenId { get; init; } = "";
+}
+
+/// <summary>POST /v2/groups/{group_openid}/batch_remove_members 响应。</summary>
+public sealed class GroupBatchRemoveMembersResult
+{
+    /// <summary>成功时为 <c>success</c>。</summary>
+    [JsonPropertyName("remove_members_result")]
+    public string RemoveMembersResult { get; init; } = "";
+
+    /// <summary>拉黑失败的 openid 列表。</summary>
+    [JsonPropertyName("add_to_member_blacklist_fail_openids")]
+    public IReadOnlyList<string> AddToMemberBlacklistFailOpenIds { get; init; } = [];
+}
+
+/// <summary>GET /v2/groups/{group_openid}/member_blacklist 响应。</summary>
+public sealed class GroupMemberBlacklist
+{
+    [JsonPropertyName("users")]
+    public IReadOnlyList<GroupBlacklistUser> Users { get; init; } = [];
+
+    /// <summary>下一页游标；空串表示已到末页。</summary>
+    [JsonPropertyName("next_cursor")]
+    public string NextCursor { get; init; } = "";
+}
+
+public sealed class GroupBlacklistUser
+{
+    [JsonPropertyName("union_openid")]
+    public string UnionOpenId { get; init; } = "";
+
+    [JsonPropertyName("member_openid")]
+    public string MemberOpenId { get; init; } = "";
+
+    [JsonPropertyName("username")]
+    public string Username { get; init; } = "";
+
+    /// <summary>拉黑时间（RFC3339）。</summary>
+    [JsonPropertyName("banned_at")]
+    public string BannedAt { get; init; } = "";
+
+    [JsonPropertyName("bot")]
+    public bool Bot { get; init; }
+}
+
+/// <summary>POST /v2/groups/{group_openid}/member_blacklist 响应。</summary>
+public sealed class GroupMemberBlacklistOpResult
+{
+    /// <summary>操作失败的 openid 列表。</summary>
+    [JsonPropertyName("fail_openids")]
+    public IReadOnlyList<string> FailOpenIds { get; init; } = [];
+}

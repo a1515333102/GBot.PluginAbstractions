@@ -1,10 +1,10 @@
-ï»¿# GBot.PluginAbstractions
+# GBot.PluginAbstractions
 
-GBot æ’ä»¶å¥‘çº¦ï¼ˆå…¬å¼€ï¼‰ã€‚ä¸»ç¨‹åº GBot å¯ä¸ºç§æœ‰ï¼›æ’ä»¶ä½œè€…å¼•ç”¨æœ¬ä»“åº“å³å¯å¼€å‘ä¸æ‰“åŒ…ã€‚
+GBot ²å¼şÆõÔ¼£¨¹«¿ª£©¡£Ö÷³ÌĞò GBot ¿ÉÎªË½ÓĞ£»²å¼ş×÷ÕßÒıÓÃ±¾²Ö¿â¼´¿É¿ª·¢Óë´ò°ü¡£
 
-å½“å‰ ABIï¼š`PluginAbstractionsVersion` = **1.5.0**ï¼ˆ`Major = 1`ï¼Œå¸‚åœº `abstractionsMajor` å¡« `1`ï¼‰
+µ±Ç° ABI£º`PluginAbstractionsVersion` = **1.6.0**£¨`Major = 1`£¬ÊĞ³¡ `abstractionsMajor` Ìî `1`£©
 
-## å¼•ç”¨æ–¹å¼
+## ÒıÓÃ·½Ê½
 
 `xml
 <ItemGroup>
@@ -14,10 +14,10 @@ GBot æ’ä»¶å¥‘çº¦ï¼ˆå…¬å¼€ï¼‰ã€‚ä¸»ç¨‹åº GBot å¯ä¸ºç§æœ‰ï¼›æ’ä»¶ä½œè€…å¼•ç”¨
 </ItemGroup>
 `
 
-æˆ–æŠŠæœ¬ä»“ clone åˆ°æœ¬åœ°å `dotnet add reference`ã€‚
+»ò°Ñ±¾²Ö clone µ½±¾µØºó `dotnet add reference`¡£
 
-**é‡è¦ï¼š** æ‰“åŒ…è¿›å¸‚åœºçš„ zip **ä¸è¦**åŒ…å« `GBot.PluginAbstractions.dll`ï¼ˆ`Private=false`ï¼‰ã€‚
+**ÖØÒª£º** ´ò°ü½øÊĞ³¡µÄ zip **²»Òª**°üº¬ `GBot.PluginAbstractions.dll`£¨`Private=false`£©¡£
 
-## ä¸Šæ¶
+## ÉÏ¼Ü
 
-è§ https://github.com/a1515333102/GBot-PluginMarketplace/blob/master/CONTRIBUTING.md
+¼û https://github.com/a1515333102/GBot-PluginMarketplace/blob/master/CONTRIBUTING.md

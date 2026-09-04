@@ -7,7 +7,7 @@ namespace GBot.PluginAbstractions;
 public static class PluginAbstractionsVersion
 {
     public const int Major = 1;
-    public const int Minor = 5;
+    public const int Minor = 6;
     public const int Patch = 0;
 
     public static string VersionString => $"{Major}.{Minor}.{Patch}";
